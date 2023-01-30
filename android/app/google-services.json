@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "109669261885",
+    "project_id": "rich-66d76",
+    "storage_bucket": "rich-66d76.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:109669261885:android:6208498f54593732ecc054",
+        "android_client_info": {
+          "package_name": "com.example.rich"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "109669261885-8osk2k9p1r2for5dj0s9ad8nmsqmtbdg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCpuF_qCJ9BR_QV1TuvVm9VEltCq_s-sdI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "109669261885-8osk2k9p1r2for5dj0s9ad8nmsqmtbdg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
