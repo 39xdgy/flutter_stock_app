@@ -65,7 +65,7 @@ class _IntroState extends State<Nav> {
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.white.withOpacity(0.5),
         showSelectedLabels: true,
-        showUnselectedLabels: false,
+        showUnselectedLabels: true,
       ),
     );
   }
