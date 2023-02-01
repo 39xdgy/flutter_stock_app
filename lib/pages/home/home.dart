@@ -15,7 +15,28 @@ class Home extends StatelessWidget {
         title: Text('Fortune Cookie'),
         backgroundColor: Colors.green,
       ),
-      body: Text(hour + ":" + minute),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'Welcome to Fortune Cookie!',
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              'The time is $hour:$minute',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Image.asset('assets/img/hammer.png')
+          ],
+        ),
+      ),
     );
   }
 }
