@@ -1,5 +1,5 @@
-import 'package:rich/pages/profile/login_widget.dart';
-import 'package:rich/pages/profile/signup_widget.dart';
+import 'package:fortune_cookie/pages/profile/login_widget.dart';
+import 'package:fortune_cookie/pages/profile/signup_widget.dart';
 import 'package:flutter/material.dart';
 
 class AuthPage extends StatefulWidget {

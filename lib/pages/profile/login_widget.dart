@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:rich/customization/utils.dart';
-import 'package:rich/main.dart';
+import 'package:fortune_cookie/customization/utils.dart';
+import 'package:fortune_cookie/main.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:rich/customization/utils.dart';
+import 'package:fortune_cookie/customization/utils.dart';
 import 'forgot_password_page.dart';
 
 class LoginWidget extends StatefulWidget {

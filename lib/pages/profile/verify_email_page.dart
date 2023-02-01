@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:rich/pages/profile/home_page.dart';
-import 'package:rich/customization/utils.dart';
+import 'package:fortune_cookie/pages/profile/profile_home_page.dart';
+import 'package:fortune_cookie/customization/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:rich/pages/home/home.dart';
+import 'package:fortune_cookie/pages/home/home.dart';
 
 class VerifyEmailPage extends StatefulWidget {
   @override
@@ -28,6 +28,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
       timer = Timer.periodic(
         //check if the user verified email every 3 seconds
         Duration(seconds: 3),
+        //add api call to backend
         (_) => checkEmailVerified(),
       );
     }
@@ -67,7 +68,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
 
   @override
   Widget build(BuildContext context) => isEmailVerified
-      ? HomePage()
+      ? ProfileHomePage()
       : Scaffold(
           appBar: AppBar(
             title: Text('Verify Email'),

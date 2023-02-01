@@ -1,7 +1,7 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:rich/main.dart';
-import 'package:rich/customization/utils.dart';
+import 'package:fortune_cookie/main.dart';
+import 'package:fortune_cookie/customization/utils.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -45,7 +45,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
               const SizedBox(height: 60),
               const SizedBox(height: 20),
               const Text(
-                'RICH',
+                'Fortune Cookie',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 32,

@@ -12,7 +12,7 @@ class Home extends StatelessWidget {
     String minute = DateFormat.m().format(DateTime.now());
     return Scaffold(
       appBar: AppBar(
-        title: Text('RICH'),
+        title: Text('Fortune Cookie'),
         backgroundColor: Colors.green,
       ),
       body: Text(hour + ":" + minute),

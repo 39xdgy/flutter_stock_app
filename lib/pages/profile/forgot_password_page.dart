@@ -1,8 +1,8 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:rich/customization/utils.dart';
+import 'package:fortune_cookie/customization/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:rich/main.dart';
+import 'package:fortune_cookie/main.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   @override

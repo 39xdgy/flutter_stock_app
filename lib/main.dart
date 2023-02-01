@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:rich/customization/utils.dart';
-import 'package:rich/pages/profile/profile.dart';
+import 'package:fortune_cookie/customization/utils.dart';
+import 'package:fortune_cookie/pages/profile/profile.dart';
 import 'pages/home/home.dart';
 import 'pages/nav.dart';
 
@@ -29,6 +29,7 @@ class MyAppState extends State<MyApp> {
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        primaryColor: Color.fromARGB(255, 199, 43, 131),
         scaffoldBackgroundColor: Color.fromARGB(255, 43, 199, 186),
         inputDecorationTheme: const InputDecorationTheme(
           labelStyle: TextStyle(

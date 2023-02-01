@@ -1,5 +1,5 @@
-name: rich
-description: A new Flutter project.
+name: fortune_cookie
+description: Fortune Cookie project.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -39,6 +39,7 @@ dependencies:
   firebase_auth: ^4.2.2
   modal_progress_hud_nsn: ^0.3.0
   email_validator: ^2.1.17
+  google_fonts: ^4.0.1
 
 
 dev_dependencies:

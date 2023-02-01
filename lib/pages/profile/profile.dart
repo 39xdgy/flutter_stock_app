@@ -2,8 +2,8 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:rich/pages/profile/verify_email_page.dart';
-import 'home_page.dart';
+import 'package:fortune_cookie/pages/profile/verify_email_page.dart';
+import 'profile_home_page.dart';
 import 'login_widget.dart';
 import 'auth_page.dart';
 
