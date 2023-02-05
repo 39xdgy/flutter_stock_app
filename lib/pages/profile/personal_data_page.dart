@@ -3,10 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
-import 'profile.dart';
+import 'package:fortune_cookie/services/user.dart';
+import 'package:fortune_cookie/utils/utils.dart';
+import 'package:fortune_cookie/models/user.dart' as user_model;
 
 class PersonalDataPage extends StatefulWidget {
-  const PersonalDataPage({Key? key}) : super(key: key);
+  PersonalDataPage({
+    super.key,
+    required this.userData,
+  });
+  final user_model.User? userData;
 
   @override
   _PersonalDataPageState createState() => _PersonalDataPageState();
@@ -16,6 +22,17 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
   final _unfocusNode = FocusNode();
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final user = FirebaseAuth.instance.currentUser!;
+  String id = "";
+  String firstName = "";
+  String lastName = "";
+  String nickName = "";
+  String email = "";
+  String phone = "";
+  int cookieNumber = 0;
+  List<String> resultList = [];
+  List<String> favStock = [];
+  List<String> strategy = [];
+
   TextEditingController? emailController;
   TextEditingController? firstNameController;
   TextEditingController? lastNameController;
@@ -27,11 +44,36 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
   @override
   void initState() {
     super.initState();
-    emailController = TextEditingController(text: 'wzongshuo@gmail.com');
-    firstNameController = TextEditingController(text: 'Zon');
-    lastNameController = TextEditingController(text: 'Wei');
-    nickNameController = TextEditingController(text: 'RichChinese');
-    phoneController = TextEditingController(text: '+1(765)434-56-78');
+    setState(() {
+      //nasty type transform stuff
+      email = widget.userData?.toJson()['email'];
+      id = widget.userData?.toJson()['id'];
+      firstName = widget.userData?.toJson()['first_name'];
+      lastName = widget.userData?.toJson()['last_name'];
+      nickName = widget.userData?.toJson()['nick_name'];
+      phone = widget.userData?.toJson()['phone_number'];
+      cookieNumber = widget.userData?.toJson()['cookie_number'];
+      if (widget.userData?.toJson()['result_list'].isEmpty) {
+        resultList = [];
+      } else {
+        resultList = widget.userData?.toJson()['result_list'];
+      }
+      if (widget.userData?.toJson()['fav_stock'].isEmpty) {
+        favStock = [];
+      } else {
+        favStock = widget.userData?.toJson()['fav_stock'];
+      }
+      if (widget.userData?.toJson()['strategy'].isEmpty) {
+        strategy = [];
+      } else {
+        strategy = widget.userData?.toJson()['strategy'];
+      }
+    });
+    emailController = TextEditingController(text: email);
+    firstNameController = TextEditingController(text: firstName);
+    lastNameController = TextEditingController(text: lastName);
+    nickNameController = TextEditingController(text: nickName);
+    phoneController = TextEditingController(text: phone);
   }
 
   @override
@@ -47,6 +89,33 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
 
   @override
   Widget build(BuildContext context) {
+    Future done() async {
+      UserService userService = UserService();
+      await userService
+          .updateUser(
+        id,
+        firstNameController!.text.trim(),
+        lastNameController!.text.trim(),
+        nickNameController!.text.trim(),
+        emailController!.text.trim(),
+        phoneController!.text.trim(),
+        cookieNumber,
+        resultList,
+        favStock,
+        strategy,
+      )
+          .then(
+        (value) {
+          if (value == "error") {
+            Utils.showSnackBar("Something went wrong, try again later");
+          } else {
+            Utils.showSnackBarBlue("Personal data updated successfully");
+            Navigator.of(context).pop(true);
+          }
+        },
+      );
+    }
+
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: const Color(0xFFE5E5E5),
@@ -81,9 +150,7 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
                 width: 62,
                 height: 35,
                 child: TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
+                  onPressed: done,
                   style: ButtonStyle(
                     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(

@@ -3,7 +3,6 @@
 //     final user = userFromJson(jsonString);
 
 import 'dart:convert';
-import 'dart:ffi';
 
 User userFromJson(String str) => User.fromJson(json.decode(str));
 

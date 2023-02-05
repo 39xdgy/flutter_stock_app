@@ -43,4 +43,49 @@ class UserService {
     }
     return null;
   }
+
+  Future<String?> updateUser(
+    String id,
+    String firstName,
+    String lastName,
+    String nickName,
+    String email,
+    String phone,
+    int cookieNumber,
+    List<String> resultList,
+    List<String> favStock,
+    List<String> strategy,
+  ) async {
+    try {
+      var url =
+          Uri.parse(ApiConstants.baseUrl + ApiConstants.userEndpoint + id);
+      final body = jsonEncode({
+        "first_name": firstName,
+        "last_name": lastName,
+        "nick_name": nickName,
+        "email": email,
+        "phone": phone,
+        "cookie_number": cookieNumber.toString(),
+        "result_list": resultList,
+        "fav_stock": favStock,
+        "strategy": strategy,
+      });
+      print(body);
+      final response = await http.put(
+        headers: {'Content-Type': 'application/json'},
+        url,
+        body: body,
+      );
+      //print(response.body);
+      if (response.statusCode == 200) {
+        return "success";
+      } else {
+        print(response.body);
+        return "error";
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+    return null;
+  }
 }

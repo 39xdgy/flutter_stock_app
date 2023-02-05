@@ -147,7 +147,6 @@ class _LoginWidgetState extends State<LoginWidget> {
       );
     } on FirebaseAuthException catch (e) {
       //add pop up error message here
-      print(e);
       switch (e.code) {
         case 'network-request-failed':
           Utils.showSnackBar('Please check your internet connection.');
