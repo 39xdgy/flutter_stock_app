@@ -27,10 +27,11 @@ class UserService {
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: {
-          "id": id,
+        body: jsonEncode({
+          "firebase_id": id,
+          "nick_name": nickName,
           "email": email,
-        },
+        }),
       );
       //print(response.body);
       if (response.statusCode == 200) {

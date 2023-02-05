@@ -58,11 +58,11 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
       var random = Random();
       //print(_auth.currentUser!.uid);
       //print(_auth.currentUser!.email);
-      // var res = await userService.createUser(
-      //   _auth.currentUser!.uid,
-      //   "Cookie Monster ${random.nextInt(10000)}",
-      //   _auth.currentUser!.email!,
-      // );
+      var res = await userService.createUser(
+        _auth.currentUser!.uid,
+        "Cookie Monster ${random.nextInt(10000)}",
+        _auth.currentUser!.email!,
+      );
       // print(res);
       // stop timer
       timer?.cancel();
