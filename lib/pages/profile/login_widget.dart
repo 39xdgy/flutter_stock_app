@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fortune_cookie/customization/utils.dart';
+import 'package:fortune_cookie/utils/utils.dart';
 import 'package:fortune_cookie/main.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:fortune_cookie/customization/utils.dart';
+import 'package:fortune_cookie/utils/utils.dart';
 import 'forgot_password_page.dart';
 
 class LoginWidget extends StatefulWidget {
@@ -103,9 +103,11 @@ class _LoginWidgetState extends State<LoginWidget> {
                     fontSize: 20,
                   ),
                 ),
-                onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => ForgotPasswordPage(),
-                )),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ForgotPasswordPage(),
+                  ),
+                ),
               ),
               SizedBox(height: 16),
               RichText(
@@ -147,6 +149,9 @@ class _LoginWidgetState extends State<LoginWidget> {
       //add pop up error message here
       print(e);
       switch (e.code) {
+        case 'network-request-failed':
+          Utils.showSnackBar('Please check your internet connection.');
+          break;
         case 'user-not-found':
           Utils.showSnackBar('No user found for that email.');
           break;

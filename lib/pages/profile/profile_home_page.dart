@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:fortune_cookie/pages/profile/personal_data_page.dart';
+import 'package:fortune_cookie/services/user.dart';
+import 'package:fortune_cookie/models/user.dart' as user_model;
 
 class ProfileHomePage extends StatefulWidget {
   const ProfileHomePage({Key? key}) : super(key: key);
@@ -13,11 +15,27 @@ class _ProfileHomePageState extends State<ProfileHomePage> {
   final _unfocusNode = FocusNode();
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final user = FirebaseAuth.instance.currentUser!;
+  final userId = FirebaseAuth.instance.currentUser!.uid;
+  user_model.User? userData;
+  String email = "";
+  String nickName = "";
 
   @override
   void dispose() {
     _unfocusNode.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    UserService userService = UserService();
+    userService.getUserById(userId).then((value) {
+      setState(() {
+        email = value?.toJson()['email'];
+        nickName = value?.toJson()['nick_name'];
+      });
+    });
   }
 
   @override
@@ -71,9 +89,9 @@ class _ProfileHomePageState extends State<ProfileHomePage> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      const Text(
-                        'RichChinese',
-                        style: TextStyle(
+                      Text(
+                        nickName,
+                        style: const TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 20,
                           fontWeight: FontWeight.normal,
@@ -81,7 +99,7 @@ class _ProfileHomePageState extends State<ProfileHomePage> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        user.email!,
+                        email,
                         style: const TextStyle(
                           fontFamily: 'Inter',
                           color: Color(0x69000000),
@@ -179,7 +197,12 @@ class _ProfileHomePageState extends State<ProfileHomePage> {
                                   size: 24,
                                 ),
                                 onPressed: () {
-                                  print('IconButton pressed ...');
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const PersonalDataPage(),
+                                    ),
+                                  );
                                 },
                               ),
                             ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:fortune_cookie/customization/utils.dart';
+import 'package:fortune_cookie/utils/utils.dart';
 import 'package:fortune_cookie/pages/profile/profile.dart';
 import 'pages/home/home.dart';
 import 'pages/nav.dart';

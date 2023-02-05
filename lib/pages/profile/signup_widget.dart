@@ -1,7 +1,7 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fortune_cookie/main.dart';
-import 'package:fortune_cookie/customization/utils.dart';
+import 'package:fortune_cookie/utils/utils.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -71,21 +71,21 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                         : null,
               ),
               const SizedBox(height: 4),
-              TextFormField(
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.normal,
-                  color: Colors.white,
-                ),
-                controller: userNameController,
-                textInputAction: TextInputAction.next,
-                decoration: const InputDecoration(labelText: 'Nickname'),
-                obscureText: false,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (value) => value != null && value.length > 20
-                    ? 'Enter max. 20 characters'
-                    : null,
-              ),
+              // TextFormField(
+              //   style: const TextStyle(
+              //     fontSize: 22,
+              //     fontWeight: FontWeight.normal,
+              //     color: Colors.white,
+              //   ),
+              //   controller: userNameController,
+              //   textInputAction: TextInputAction.next,
+              //   decoration: const InputDecoration(labelText: 'Nickname'),
+              //   obscureText: false,
+              //   autovalidateMode: AutovalidateMode.onUserInteraction,
+              //   validator: (value) => value != null && value.length > 20
+              //       ? 'Enter max. 20 characters'
+              //       : null,
+              // ),
               const SizedBox(height: 4),
               TextFormField(
                 style: const TextStyle(

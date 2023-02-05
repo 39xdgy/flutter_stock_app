@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fortune_cookie/pages/profile/profile_home_page.dart';
-import 'package:fortune_cookie/customization/utils.dart';
+import 'package:fortune_cookie/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:fortune_cookie/pages/home/home.dart';
+import 'personal_data_page.dart';
+import 'package:fortune_cookie/services/user.dart';
+import 'dart:math';
 
 class VerifyEmailPage extends StatefulWidget {
   @override
@@ -14,13 +17,15 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
   bool isEmailVerified = false;
   bool canResendEmail = false;
   Timer? timer;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  UserService userService = UserService();
 
   @override
   void initState() {
     super.initState();
 
     /// user needs to be created before!
-    isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
+    isEmailVerified = _auth.currentUser!.emailVerified;
 
     if (!isEmailVerified) {
       sendVerificationEmail();
@@ -37,19 +42,31 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
   @override
   void dispose() {
     timer?.cancel();
-
     super.dispose();
   }
 
   Future checkEmailVerified() async {
     // call after email verification!
-    await FirebaseAuth.instance.currentUser!.reload();
+    await _auth.currentUser!.reload();
 
     setState(() {
-      isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
+      isEmailVerified = _auth.currentUser!.emailVerified;
     });
 
-    if (isEmailVerified) timer?.cancel();
+    if (isEmailVerified) {
+      // update user data
+      var random = Random();
+      //print(_auth.currentUser!.uid);
+      //print(_auth.currentUser!.email);
+      // var res = await userService.createUser(
+      //   _auth.currentUser!.uid,
+      //   "Cookie Monster ${random.nextInt(10000)}",
+      //   _auth.currentUser!.email!,
+      // );
+      // print(res);
+      // stop timer
+      timer?.cancel();
+    }
   }
 
   Future sendVerificationEmail() async {
