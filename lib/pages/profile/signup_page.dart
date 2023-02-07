@@ -123,7 +123,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size.fromHeight(50),
-                  backgroundColor: Color.fromARGB(193, 250, 50, 130),
+                  backgroundColor: Theme.of(context).primaryColor,
                 ),
                 icon: const Icon(Icons.arrow_forward, size: 32),
                 label: const Text(

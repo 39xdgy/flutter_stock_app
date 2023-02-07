@@ -64,7 +64,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(193, 250, 50, 130),
+                    backgroundColor: Theme.of(context).primaryColor,
                     minimumSize: const Size.fromHeight(50),
                   ),
                   icon: const Icon(Icons.email_outlined),

@@ -2,7 +2,7 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
+import 'package:fortune_cookie/themes/main_theme.dart';
 import 'home/home.dart';
 import 'generate/generate.dart';
 import 'profile/profile.dart';
@@ -27,18 +27,6 @@ class _IntroState extends State<Nav> {
     });
   }
 
-  var hour = int.parse(DateFormat.H().format(DateTime.now()));
-  var minute = int.parse(DateFormat.m().format(DateTime.now()));
-  Color getBackgroundColor() {
-    if (hour >= 16 || hour < 9) {
-      return Color.fromARGB(255, 109, 21, 56);
-    } else if (hour == 9 && minute < 30) {
-      return Color.fromARGB(255, 109, 21, 56);
-    } else {
-      return Color.fromARGB(193, 250, 50, 130);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,7 +49,7 @@ class _IntroState extends State<Nav> {
           ),
         ],
         type: BottomNavigationBarType.fixed,
-        backgroundColor: getBackgroundColor(),
+        backgroundColor: Theme.of(context).primaryColor,
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.white.withOpacity(0.5),
         showSelectedLabels: true,
