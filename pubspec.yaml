@@ -43,6 +43,8 @@ dependencies:
   http: ^0.13.5
   mask_text_input_formatter: ^2.4.0
   google_sign_in: ^5.4.4
+  flutter_launcher_icons: ^0.11.0
+  flutter_native_splash: ^2.2.16
 
 dev_dependencies:
   flutter_test:
@@ -96,3 +98,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+flutter_icons:
+    image_path_android: "assets/img/background.png"
+    adaptive_icon_background: "	#c72b83"
+    adaptive_icon_foreground: "assets/img/background.png"
+    android: true
+    min_sdk_android: 21
