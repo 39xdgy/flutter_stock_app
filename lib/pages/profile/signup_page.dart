@@ -1,7 +1,7 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fortune_cookie/main.dart';
-import 'package:fortune_cookie/utils/utils.dart';
+import 'package:fortune_cookie/widgets/utils.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 

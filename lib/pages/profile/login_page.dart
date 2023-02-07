@@ -1,9 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fortune_cookie/utils/utils.dart';
+import 'package:fortune_cookie/widgets/utils.dart';
 import 'package:fortune_cookie/main.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:fortune_cookie/utils/utils.dart';
+import 'package:fortune_cookie/widgets/google_sign_in_button.dart';
+import 'package:fortune_cookie/utils/authentication.dart';
+
 import 'forgot_password_page.dart';
 
 class LoginWidget extends StatefulWidget {
@@ -39,7 +41,7 @@ class _LoginWidgetState extends State<LoginWidget> {
               const SizedBox(height: 60),
               const SizedBox(height: 20),
               const Text(
-                'RICH',
+                'Fortune Cookie',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontSize: 32,
@@ -94,6 +96,18 @@ class _LoginWidgetState extends State<LoginWidget> {
                 onPressed: signIn,
               ),
               SizedBox(height: 24),
+              FutureBuilder(
+                future: Authentication.initializeFirebase(context: context),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Text('Error initializing Firebase');
+                  } else if (snapshot.connectionState == ConnectionState.done) {
+                    return GoogleSignInButton();
+                  }
+                  return CircularProgressIndicator();
+                },
+              ),
+              SizedBox(height: 16),
               GestureDetector(
                 child: Text(
                   'Forgot Password?',

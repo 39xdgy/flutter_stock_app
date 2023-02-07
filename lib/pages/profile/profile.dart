@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fortune_cookie/pages/profile/verify_email_page.dart';
 import 'profile_home_page.dart';
-import 'login_widget.dart';
+import 'login_page.dart';
 import 'auth_page.dart';
 
 class Profile extends StatefulWidget {

@@ -4,7 +4,7 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 import 'package:fortune_cookie/services/user.dart';
-import 'package:fortune_cookie/utils/utils.dart';
+import 'package:fortune_cookie/widgets/utils.dart';
 import 'package:fortune_cookie/models/user.dart' as user_model;
 
 class PersonalDataPage extends StatefulWidget {

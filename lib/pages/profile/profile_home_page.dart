@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fortune_cookie/pages/profile/personal_data_page.dart';
 import 'package:fortune_cookie/services/user.dart';
 import 'package:fortune_cookie/models/user.dart' as user_model;
+import "forgot_password_page.dart";
 
 class ProfileHomePage extends StatefulWidget {
   const ProfileHomePage({Key? key}) : super(key: key);
@@ -401,7 +402,12 @@ class _ProfileHomePageState extends State<ProfileHomePage> {
                                     size: 24,
                                   ),
                                   onPressed: () {
-                                    print('IconButton pressed ...');
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            ForgotPasswordPage(),
+                                      ),
+                                    );
                                   },
                                 ),
                               ),

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fortune_cookie/pages/profile/profile_home_page.dart';
-import 'package:fortune_cookie/utils/utils.dart';
+import 'package:fortune_cookie/widgets/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:fortune_cookie/pages/home/home.dart';
 import 'personal_data_page.dart';
