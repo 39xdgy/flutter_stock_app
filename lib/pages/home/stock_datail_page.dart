@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
+import 'package:fortune_cookie/themes/stock_theme.dart' as StockTheme;
 
 class StockWidget extends StatefulWidget {
   var ticker;
@@ -27,7 +28,8 @@ class _StockWidgetState extends State<StockWidget> {
   late Future history;
   String _period = '1d';
   String _interval = '1m';
-  String price = "";
+  final StreamController<String> _priceController = StreamController<String>();
+
   String _priceChange = "";
   String _priceChangePercent = "";
   Color _priceChangeColor = Colors.white;
@@ -80,21 +82,45 @@ class _StockWidgetState extends State<StockWidget> {
 
       //calculate price change percentage
       double priceChangePercent =
-          (double.parse(currPrice) - double.parse(firstPrice)) /
+          (double.parse(currPrice) - double.parse(firstPrice)) *
+              100 /
               double.parse(firstPrice);
 
       setState(() {
         _spots = stockData;
+        //set price change text
+        switch (period) {
+          case '1d':
+            _priceChangeText = "Today";
+            break;
+          case '5d':
+            _priceChangeText = "Past Week";
+            break;
+          case '1mo':
+            _priceChangeText = "Past Month";
+            break;
+          case '3mo':
+            _priceChangeText = "Past 3 Months";
+            break;
+          case '1y':
+            _priceChangeText = "Past Year";
+            break;
+          case '5y':
+            _priceChangeText = "Past 5 Years";
+            break;
+          default:
+            break;
+        }
         //set dynamic price change text
         if (priceChange < 0) {
           _priceChange = (-1 * priceChange).toStringAsFixed(2);
           _priceChangePercent = (-1 * priceChangePercent).toStringAsFixed(2);
-          _priceChangeColor = Color.fromARGB(255, 230, 72, 1);
+          _priceChangeColor = StockTheme.priceDecreaseColor;
           _priceChangeIcon = Icons.arrow_drop_down;
         } else {
           _priceChange = priceChange.toStringAsFixed(2);
           _priceChangePercent = priceChangePercent.toStringAsFixed(2);
-          _priceChangeColor = Color.fromARGB(255, 0, 200, 6);
+          _priceChangeColor = StockTheme.priceIncreaseColor;
           _priceChangeIcon = Icons.arrow_drop_up;
         }
       });
@@ -102,7 +128,7 @@ class _StockWidgetState extends State<StockWidget> {
     }
   }
 
-  //get realtime price and set state
+  //get realtime day price and set state
   Future _getPrice(String ticker) async {
     //FocusScope.of(context).requestFocus(FocusNode());
     var response = await http.get(Uri.parse(
@@ -110,13 +136,43 @@ class _StockWidgetState extends State<StockWidget> {
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
 
-      //print(data['Close'].keys.last);
+      //get the last time and price
       String lastTime = data['Close'].keys.last;
       String currPrice = data['Close'][lastTime].toString();
+      //get the first time and price
+      String firstTime = data['Close'].keys.first;
+      String firstPrice = data['Close'][firstTime].toString();
 
-      setState(() {
-        price = double.parse(currPrice).toStringAsFixed(2);
-      });
+      //calculate price change
+      double priceChange = double.parse(currPrice) - double.parse(firstPrice);
+
+      //calculate price change percentage
+      double priceChangePercent =
+          (double.parse(currPrice) - double.parse(firstPrice)) /
+              double.parse(firstPrice) *
+              0.01;
+
+      setState(
+        () {
+          String price = double.parse(currPrice).toStringAsFixed(2);
+          _priceController.add(price);
+          //set dynamic price change text
+          if (_priceChangeText == "1d") {
+            if (priceChange < 0) {
+              _priceChange = (-1 * priceChange).toStringAsFixed(2);
+              _priceChangePercent =
+                  (-1 * priceChangePercent).toStringAsFixed(2);
+              _priceChangeColor = Color.fromARGB(255, 230, 72, 1);
+              _priceChangeIcon = Icons.arrow_drop_down;
+            } else {
+              _priceChange = priceChange.toStringAsFixed(2);
+              _priceChangePercent = priceChangePercent.toStringAsFixed(2);
+              _priceChangeColor = Color.fromARGB(255, 0, 200, 6);
+              _priceChangeIcon = Icons.arrow_drop_up;
+            }
+          }
+        },
+      );
       return currPrice;
     }
   }
@@ -139,7 +195,7 @@ class _StockWidgetState extends State<StockWidget> {
         leading: IconButton(
           icon: Icon(
             Icons.chevron_left,
-            color: Color(0xFFF23333),
+            color: _priceChangeColor,
             size: 30,
           ),
           onPressed: () {
@@ -150,7 +206,7 @@ class _StockWidgetState extends State<StockWidget> {
           IconButton(
             icon: Icon(
               Icons.notifications_none,
-              color: Color(0xFFF23333),
+              color: _priceChangeColor,
               size: 30,
             ),
             onPressed: () {
@@ -203,13 +259,21 @@ class _StockWidgetState extends State<StockWidget> {
                     ),
                     Align(
                       alignment: AlignmentDirectional(-0.9, 0),
-                      child: Text(
-                        '\$$price',
-                        style: GoogleFonts.getFont(
-                          'Inter',
-                          fontWeight: FontWeight.w500,
-                          fontSize: 32,
-                        ),
+                      child: StreamBuilder<String>(
+                        stream: _priceController.stream,
+                        builder: (BuildContext context,
+                            AsyncSnapshot<String> snapshot) {
+                          if (snapshot.hasData) {
+                            return Text('\$${snapshot.data}',
+                                style: GoogleFonts.getFont(
+                                  'Inter',
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 32,
+                                ));
+                          } else {
+                            return Container();
+                          }
+                        },
                       ),
                     ),
                     SizedBox(
@@ -238,7 +302,7 @@ class _StockWidgetState extends State<StockWidget> {
                           ),
                         ),
                         Container(
-                          width: 100,
+                          width: 120,
                           height: 30,
                           decoration: BoxDecoration(
                             color: Color(0x00FFFFFF),
@@ -257,7 +321,7 @@ class _StockWidgetState extends State<StockWidget> {
                           ),
                         ),
                         Container(
-                          width: 60,
+                          width: 100,
                           height: 30,
                           decoration: BoxDecoration(
                             color: Color(0x00FFFFFF),
@@ -265,7 +329,7 @@ class _StockWidgetState extends State<StockWidget> {
                           child: Align(
                             alignment: AlignmentDirectional(-1, 0),
                             child: Text(
-                              'Past week',
+                              _priceChangeText,
                               style: GoogleFonts.getFont(
                                 'Inter',
                                 fontSize: 12,
@@ -299,7 +363,7 @@ class _StockWidgetState extends State<StockWidget> {
                                 return spotIndexes.map((spotIndex) {
                                   return TouchedSpotIndicatorData(
                                     FlLine(
-                                      color: Color(0xFFF23333).withOpacity(0.2),
+                                      color: _priceChangeColor.withOpacity(0.2),
                                       strokeWidth: 1,
                                     ),
                                     FlDotData(
@@ -309,23 +373,54 @@ class _StockWidgetState extends State<StockWidget> {
                                 }).toList();
                               },
                               touchTooltipData: LineTouchTooltipData(
+                                showOnTopOfTheChartBoxArea: true,
+                                fitInsideHorizontally: true,
                                 getTooltipItems:
+                                    // line chart on touch function here
                                     (List<LineBarSpot> touchedBarSpots) {
                                   return touchedBarSpots.map((barSpot) {
                                     final flSpot = barSpot;
-                                    if (flSpot.x == 0) {
-                                      return LineTooltipItem(
-                                        '0',
-                                        TextStyle(
-                                          color: Color(0xFFF23333),
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      );
+                                    var date =
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                            flSpot.x.toInt());
+                                    DateFormat formatter;
+                                    switch (_period) {
+                                      case '1d':
+                                        formatter =
+                                            DateFormat('yyyy-MM-dd HH:mm:ss');
+                                        break;
+                                      case '1w':
+                                        formatter =
+                                            DateFormat('yyyy-MM-dd HH:mm:ss');
+                                        break;
+                                      case '1mo':
+                                        formatter = DateFormat('yyyy-MM-dd');
+                                        break;
+                                      case '3mo':
+                                        formatter = DateFormat('yyyy-MM-dd');
+                                        break;
+                                      case '1y':
+                                        formatter = DateFormat('yyyy-MM-dd');
+                                        break;
+                                      case '5y':
+                                        formatter = DateFormat('yyyy-MM-dd');
+                                        break;
+                                      default:
+                                        formatter =
+                                            DateFormat('yyyy-MM-dd HH:mm:ss');
                                     }
+
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback((_) =>
+                                            setState(() {
+                                              _priceController.add(
+                                                  flSpot.y.toStringAsFixed(2));
+                                            }));
+
                                     return LineTooltipItem(
-                                      '\$${flSpot.y.toStringAsFixed(2)}',
+                                      formatter.format(date),
                                       TextStyle(
-                                        color: Color(0xFFF23333),
+                                        color: Colors.grey[800],
                                         fontWeight: FontWeight.bold,
                                       ),
                                     );
@@ -350,7 +445,7 @@ class _StockWidgetState extends State<StockWidget> {
                             lineBarsData: [
                               LineChartBarData(
                                 spots: _spots,
-                                color: Color(0xFFF23333),
+                                color: _priceChangeColor,
                                 barWidth: 2,
                                 isStrokeCapRound: true,
                                 dotData: FlDotData(
@@ -361,8 +456,8 @@ class _StockWidgetState extends State<StockWidget> {
                                       begin: Alignment.topCenter,
                                       end: Alignment.bottomCenter,
                                       colors: [
-                                        Color(0xFFF23333).withOpacity(0.1),
-                                        Color(0xFFF23333).withOpacity(0),
+                                        _priceChangeColor.withOpacity(0.1),
+                                        _priceChangeColor.withOpacity(0),
                                       ]),
                                   show: true,
                                 ),
