@@ -85,8 +85,8 @@ class _ProfileHomePageState extends State<ProfileHomePage> {
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
                             ),
-                            child: Image.network(
-                              'https://picsum.photos/seed/87/600',
+                            child: Image.asset(
+                              'assets/img/avatar/2.png',
                               fit: BoxFit.cover,
                             ),
                           ),

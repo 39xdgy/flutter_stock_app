@@ -195,8 +195,8 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                     ),
-                    child: Image.network(
-                      'https://picsum.photos/seed/508/600',
+                    child: Image.asset(
+                      'assets/img/avatar/2.png',
                       fit: BoxFit.cover,
                     ),
                   ),

@@ -25,8 +25,16 @@ class CustomTheme with ChangeNotifier {
     return ThemeData(
       primaryColor: const Color.fromARGB(255, 199, 43, 131),
       scaffoldBackgroundColor: const Color.fromARGB(255, 43, 199, 186),
+      textTheme: const TextTheme(
+        displayLarge: TextStyle(
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          color: Color.fromARGB(255, 208, 208, 208),
+        ),
+      ),
       inputDecorationTheme: const InputDecorationTheme(
         labelStyle: TextStyle(
+          fontSize: 20,
           color: Color.fromARGB(255, 255, 255, 255),
         ),
       ),
@@ -46,6 +54,7 @@ class CustomTheme with ChangeNotifier {
       ),
       inputDecorationTheme: const InputDecorationTheme(
         labelStyle: TextStyle(
+          fontSize: 20,
           color: Color.fromARGB(255, 255, 255, 255),
         ),
       ),

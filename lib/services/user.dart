@@ -65,7 +65,7 @@ class UserService {
         "last_name": lastName,
         "nick_name": nickName,
         "email": email,
-        "phone": phone,
+        "phone_number": phone,
         "cookie_number": cookieNumber.toString(),
         "result_list": resultList,
         "fav_stock": favStock,
