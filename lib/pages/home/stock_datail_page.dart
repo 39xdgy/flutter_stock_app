@@ -188,9 +188,9 @@ class _StockWidgetState extends State<StockWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      backgroundColor: Colors.white,
+      backgroundColor: StockTheme.screenBackground,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: StockTheme.screenBackground,
         automaticallyImplyLeading: false,
         leading: IconButton(
           icon: Icon(
@@ -210,7 +210,7 @@ class _StockWidgetState extends State<StockWidget> {
               size: 30,
             ),
             onPressed: () {
-              print('IconButton pressed ...');
+              print('Notification IconButton pressed ...');
             },
           ),
         ],
@@ -240,6 +240,8 @@ class _StockWidgetState extends State<StockWidget> {
                         widget.ticker,
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
+                          fontSize: 22,
+                          color: StockTheme.textColor,
                         ),
                       ),
                     ),
@@ -254,6 +256,7 @@ class _StockWidgetState extends State<StockWidget> {
                           'Inter',
                           fontWeight: FontWeight.w500,
                           fontSize: 32,
+                          color: StockTheme.textColor,
                         ),
                       ),
                     ),
@@ -269,6 +272,7 @@ class _StockWidgetState extends State<StockWidget> {
                                   'Inter',
                                   fontWeight: FontWeight.w500,
                                   fontSize: 32,
+                                  color: StockTheme.textColor,
                                 ));
                           } else {
                             return Container();
@@ -333,6 +337,7 @@ class _StockWidgetState extends State<StockWidget> {
                               style: GoogleFonts.getFont(
                                 'Inter',
                                 fontSize: 12,
+                                color: StockTheme.textColor,
                               ),
                             ),
                           ),
@@ -361,9 +366,10 @@ class _StockWidgetState extends State<StockWidget> {
                                   (LineChartBarData barData,
                                       List<int> spotIndexes) {
                                 return spotIndexes.map((spotIndex) {
+                                  //touch line style
                                   return TouchedSpotIndicatorData(
                                     FlLine(
-                                      color: _priceChangeColor.withOpacity(0.2),
+                                      color: _priceChangeColor.withOpacity(0.3),
                                       strokeWidth: 1,
                                     ),
                                     FlDotData(
@@ -420,7 +426,8 @@ class _StockWidgetState extends State<StockWidget> {
                                     return LineTooltipItem(
                                       formatter.format(date),
                                       TextStyle(
-                                        color: Colors.grey[800],
+                                        color: StockTheme.textColor
+                                            .withOpacity(0.6),
                                         fontWeight: FontWeight.bold,
                                       ),
                                     );
@@ -444,19 +451,31 @@ class _StockWidgetState extends State<StockWidget> {
                             ),
                             lineBarsData: [
                               LineChartBarData(
+                                shadow: Shadow(
+                                  color: _priceChangeColor.withOpacity(0.3),
+                                  offset: Offset(0, 8),
+                                  blurRadius: 8,
+                                ),
                                 spots: _spots,
-                                color: _priceChangeColor,
+                                gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      _priceChangeColor,
+                                      _priceChangeColor,
+                                    ]),
                                 barWidth: 2,
                                 isStrokeCapRound: true,
                                 dotData: FlDotData(
                                   show: false,
                                 ),
+                                // line chart below gradient
                                 belowBarData: BarAreaData(
                                   gradient: LinearGradient(
                                       begin: Alignment.topCenter,
                                       end: Alignment.bottomCenter,
                                       colors: [
-                                        _priceChangeColor.withOpacity(0.1),
+                                        _priceChangeColor.withOpacity(0.2),
                                         _priceChangeColor.withOpacity(0),
                                       ]),
                                   show: true,
@@ -510,9 +529,8 @@ class _StockWidgetState extends State<StockWidget> {
                       child: Text('1D',
                           style: GoogleFonts.getFont(
                             'Inter',
-                            color: _1d
-                                ? Color(0xFFF23333)
-                                : Color.fromARGB(255, 0, 0, 0),
+                            color:
+                                _1d ? _priceChangeColor : StockTheme.textColor,
                             fontWeight: FontWeight.w600,
                             fontSize: 10,
                           )),
@@ -547,9 +565,7 @@ class _StockWidgetState extends State<StockWidget> {
                         '1W',
                         style: GoogleFonts.getFont(
                           'Inter',
-                          color: _1w
-                              ? Color(0xFFF23333)
-                              : Color.fromARGB(255, 0, 0, 0),
+                          color: _1w ? _priceChangeColor : StockTheme.textColor,
                           fontWeight: FontWeight.w600,
                           fontSize: 10,
                         ),
@@ -585,9 +601,7 @@ class _StockWidgetState extends State<StockWidget> {
                         '1M',
                         style: GoogleFonts.getFont(
                           'Inter',
-                          color: _1m
-                              ? Color(0xFFF23333)
-                              : Color.fromARGB(255, 0, 0, 0),
+                          color: _1m ? _priceChangeColor : StockTheme.textColor,
                           fontWeight: FontWeight.w600,
                           fontSize: 10,
                         ),
@@ -623,9 +637,7 @@ class _StockWidgetState extends State<StockWidget> {
                         '3M',
                         style: GoogleFonts.getFont(
                           'Inter',
-                          color: _3m
-                              ? Color(0xFFF23333)
-                              : Color.fromARGB(255, 0, 0, 0),
+                          color: _3m ? _priceChangeColor : StockTheme.textColor,
                           fontWeight: FontWeight.w600,
                           fontSize: 10,
                         ),
@@ -661,9 +673,7 @@ class _StockWidgetState extends State<StockWidget> {
                         '1Y',
                         style: GoogleFonts.getFont(
                           'Inter',
-                          color: _1y
-                              ? Color(0xFFF23333)
-                              : Color.fromARGB(255, 0, 0, 0),
+                          color: _1y ? _priceChangeColor : StockTheme.textColor,
                           fontWeight: FontWeight.w600,
                           fontSize: 10,
                         ),
@@ -699,9 +709,7 @@ class _StockWidgetState extends State<StockWidget> {
                         '5Y',
                         style: GoogleFonts.getFont(
                           'Inter',
-                          color: _5y
-                              ? Color(0xFFF23333)
-                              : Color.fromARGB(255, 0, 0, 0),
+                          color: _5y ? _priceChangeColor : StockTheme.textColor,
                           fontWeight: FontWeight.w600,
                           fontSize: 10,
                         ),
