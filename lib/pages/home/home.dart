@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +43,79 @@ class _HomeState extends State<Home> {
                 style: Theme.of(context).textTheme.displayLarge,
               ),
             ),
+            // Container(
+            //   padding: const EdgeInsets.all(16.0),
+            //   height: 200,
+            //   width: 400,
+            //   child: LineChart(
+            //     LineChartData(
+            //       lineTouchData: LineTouchData(
+            //         enabled: false,
+            //       ),
+            //       gridData: FlGridData(
+            //         show: false,
+            //       ),
+            //       titlesData: FlTitlesData(
+            //         bottomTitles: AxisTitles(
+            //           sideTitles: SideTitles(
+            //             showTitles: true,
+            //             reservedSize: 22,
+            //             getTitlesWidget: (value, meta) {
+            //               print(value);
+            //               return Text(
+            //                 value.toString(),
+            //               );
+            //             },
+            //           ),
+            //         ),
+            //         leftTitles: AxisTitles(
+            //           sideTitles: SideTitles(
+            //             showTitles: true,
+            //             reservedSize: 22,
+            //             getTitlesWidget: (value, meta) {
+            //               return Text(
+            //                 value.toString(),
+            //               );
+            //             },
+            //           ),
+            //         ),
+            //       ),
+            //       borderData: FlBorderData(
+            //         show: true,
+            //       ),
+            //       minX: 0,
+            //       maxX: 10,
+            //       minY: 0,
+            //       maxY: 11,
+            //       lineBarsData: [
+            //         LineChartBarData(
+            //           spots: [
+            //             FlSpot(0, 0),
+            //             FlSpot(1, 1),
+            //             FlSpot(2, 4),
+            //             FlSpot(3, 5),
+            //             FlSpot(4, 7),
+            //             FlSpot(5, 8),
+            //             //FlSpot(6, 8),
+            //             //FlSpot(7, 8),
+            //             FlSpot(8, 11),
+            //             FlSpot(9, 9),
+            //             FlSpot(10, 10),
+            //           ],
+            //           isCurved: true,
+            //           barWidth: 5,
+            //           isStrokeCapRound: true,
+            //           dotData: FlDotData(
+            //             show: false,
+            //           ),
+            //           belowBarData: BarAreaData(
+            //             show: true,
+            //           ),
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
             Container(
               padding: EdgeInsets.all(16.0),
               child: TextField(

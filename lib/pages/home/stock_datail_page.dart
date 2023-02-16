@@ -24,18 +24,21 @@ class _StockWidgetState extends State<StockWidget> {
   late Timer timer;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final _unfocusNode = FocusNode();
-  late Future priceInit;
   late Future history;
   String _period = '1d';
   String _interval = '1m';
   final StreamController<String> _priceController = StreamController<String>();
-
-  String _priceChange = "";
-  String _priceChangePercent = "";
+  final StreamController<String> _priceChangeController =
+      StreamController<String>();
+  final StreamController<String> _priceChangePercentController =
+      StreamController<String>();
+  double _currPrice = 0.0;
+  double _firstPrice = 0.0;
   Color _priceChangeColor = Colors.white;
   IconData _priceChangeIcon = Icons.block;
   String _priceChangeText = "";
-
+  bool _loading = true;
+  bool _touch = false;
   bool _1d = true;
   bool _1w = false;
   bool _1m = false;
@@ -45,14 +48,18 @@ class _StockWidgetState extends State<StockWidget> {
 
   @override
   void initState() {
-    priceInit = _getPrice(widget.ticker);
-    //refresh stock price every XX seconds
-    timer = Timer.periodic(Duration(seconds: 30), (_) {
-      setState(() {
-        priceInit = _getPrice(widget.ticker);
-      });
-    });
+    //get first price and history first
+    _getCurrPrice(widget.ticker);
     history = _getHistory(widget.ticker, _period, _interval);
+    //refresh stock price every XX seconds
+    timer = Timer.periodic(Duration(seconds: 1), (_) {
+      if (!_touch) {
+        setState(() {
+          _getCurrPrice(widget.ticker);
+        });
+      }
+    });
+
     super.initState();
   }
 
@@ -69,111 +76,98 @@ class _StockWidgetState extends State<StockWidget> {
           FlSpot(double.parse(time), data['Close'][time]),
         );
       }
-      //get the last time and price
-      String lastTime = data['Close'].keys.last;
-      String currPrice = data['Close'][lastTime].toString();
 
       //get the first time and price
       String firstTime = data['Close'].keys.first;
-      String firstPrice = data['Close'][firstTime].toString();
+      double firstPrice = data['Close'][firstTime];
 
+      //set the price change color
+      setState(
+        () {
+          _spots = stockData;
+          _firstPrice = firstPrice;
+          //set price change text
+          switch (period) {
+            case '1d':
+              _priceChangeText = "Today";
+              break;
+            case '5d':
+              _priceChangeText = "Past Week";
+              break;
+            case '1mo':
+              _priceChangeText = "Past Month";
+              break;
+            case '3mo':
+              _priceChangeText = "Past 3 Months";
+              break;
+            case '1y':
+              _priceChangeText = "Past Year";
+              break;
+            case '5y':
+              _priceChangeText = "Past 5 Years";
+              break;
+            default:
+              break;
+          }
+        },
+      );
       //calculate price change
-      double priceChange = double.parse(currPrice) - double.parse(firstPrice);
-
+      double priceChange = _currPrice - _firstPrice;
       //calculate price change percentage
-      double priceChangePercent =
-          (double.parse(currPrice) - double.parse(firstPrice)) *
-              100 /
-              double.parse(firstPrice);
+      double priceChangePercent = priceChange / _firstPrice * 0.01;
 
-      setState(() {
-        _spots = stockData;
-        //set price change text
-        switch (period) {
-          case '1d':
-            _priceChangeText = "Today";
-            break;
-          case '5d':
-            _priceChangeText = "Past Week";
-            break;
-          case '1mo':
-            _priceChangeText = "Past Month";
-            break;
-          case '3mo':
-            _priceChangeText = "Past 3 Months";
-            break;
-          case '1y':
-            _priceChangeText = "Past Year";
-            break;
-          case '5y':
-            _priceChangeText = "Past 5 Years";
-            break;
-          default:
-            break;
-        }
-        //set dynamic price change text
-        if (priceChange < 0) {
-          _priceChange = (-1 * priceChange).toStringAsFixed(2);
-          _priceChangePercent = (-1 * priceChangePercent).toStringAsFixed(2);
-          _priceChangeColor = StockTheme.priceDecreaseColor;
-          _priceChangeIcon = Icons.arrow_drop_down;
-        } else {
-          _priceChange = priceChange.toStringAsFixed(2);
-          _priceChangePercent = priceChangePercent.toStringAsFixed(2);
-          _priceChangeColor = StockTheme.priceIncreaseColor;
-          _priceChangeIcon = Icons.arrow_drop_up;
-        }
-      });
+      //set dynamic price change text
+      if (priceChange < 0) {
+        _priceChangeController.add((-1 * priceChange).toStringAsFixed(2));
+        _priceChangePercentController
+            .add((-1 * priceChangePercent).toStringAsFixed(2));
+        _priceChangeColor = Color.fromARGB(255, 230, 72, 1);
+        _priceChangeIcon = Icons.arrow_drop_down;
+      } else {
+        _priceChangeController.add(priceChange.toStringAsFixed(2));
+        _priceChangePercentController
+            .add(priceChangePercent.toStringAsFixed(2));
+        _priceChangeColor = Color.fromARGB(255, 0, 200, 6);
+        _priceChangeIcon = Icons.arrow_drop_up;
+      }
       return stockData;
     }
   }
 
-  //get realtime day price and set state
-  Future _getPrice(String ticker) async {
+  Future _getCurrPrice(String ticker) async {
     //FocusScope.of(context).requestFocus(FocusNode());
-    var response = await http.get(Uri.parse(
-        'http://10.0.2.2:8000/history?symbol=$ticker&interval=1m&period=1d'));
+    var response =
+        await http.get(Uri.parse('http://10.0.2.2:8000/quote?symbol=$ticker'));
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
-
-      //get the last time and price
-      String lastTime = data['Close'].keys.last;
-      String currPrice = data['Close'][lastTime].toString();
-      //get the first time and price
-      String firstTime = data['Close'].keys.first;
-      String firstPrice = data['Close'][firstTime].toString();
-
+      double currPrice = data['lastPrice'];
+      _priceController.add(data['lastPrice'].toStringAsFixed(2));
       //calculate price change
-      double priceChange = double.parse(currPrice) - double.parse(firstPrice);
-
+      double priceChange = currPrice - _firstPrice;
       //calculate price change percentage
-      double priceChangePercent =
-          (double.parse(currPrice) - double.parse(firstPrice)) /
-              double.parse(firstPrice) *
-              0.01;
+      double priceChangePercent = priceChange / _firstPrice * 0.01;
+
+      //set dynamic price change text
+
+      if (priceChange < 0) {
+        _priceChangeController.add((-1 * priceChange).toStringAsFixed(2));
+        _priceChangePercentController
+            .add((-1 * priceChangePercent).toStringAsFixed(2));
+        _priceChangeColor = Color.fromARGB(255, 230, 72, 1);
+        _priceChangeIcon = Icons.arrow_drop_down;
+      } else {
+        _priceChangeController.add(priceChange.toStringAsFixed(2));
+        _priceChangePercentController
+            .add(priceChangePercent.toStringAsFixed(2));
+        _priceChangeColor = Color.fromARGB(255, 0, 200, 6);
+        _priceChangeIcon = Icons.arrow_drop_up;
+      }
 
       setState(
         () {
-          String price = double.parse(currPrice).toStringAsFixed(2);
-          _priceController.add(price);
-          //set dynamic price change text
-          if (_priceChangeText == "1d") {
-            if (priceChange < 0) {
-              _priceChange = (-1 * priceChange).toStringAsFixed(2);
-              _priceChangePercent =
-                  (-1 * priceChangePercent).toStringAsFixed(2);
-              _priceChangeColor = Color.fromARGB(255, 230, 72, 1);
-              _priceChangeIcon = Icons.arrow_drop_down;
-            } else {
-              _priceChange = priceChange.toStringAsFixed(2);
-              _priceChangePercent = priceChangePercent.toStringAsFixed(2);
-              _priceChangeColor = Color.fromARGB(255, 0, 200, 6);
-              _priceChangeIcon = Icons.arrow_drop_up;
-            }
-          }
+          _currPrice = currPrice;
         },
       );
-      return currPrice;
     }
   }
 
@@ -313,14 +307,27 @@ class _StockWidgetState extends State<StockWidget> {
                           ),
                           child: Align(
                             alignment: AlignmentDirectional(-1, 0),
-                            child: Text(
-                              '\$$_priceChange ($_priceChangePercent%)',
-                              style: GoogleFonts.getFont(
-                                'Inter',
-                                color: _priceChangeColor,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12,
-                              ),
+                            child: StreamBuilder<String>(
+                              stream: _priceChangeController.stream,
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<String> snapshot) {
+                                if (snapshot.hasData) {
+                                  double priceChange =
+                                      double.parse(snapshot.data!);
+                                  double percent =
+                                      100 * priceChange / _firstPrice;
+                                  return Text(
+                                      '\$${snapshot.data}(${percent.toStringAsFixed(2)}%)',
+                                      style: GoogleFonts.getFont(
+                                        'Inter',
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 12,
+                                        color: _priceChangeColor,
+                                      ));
+                                } else {
+                                  return Container();
+                                }
+                              },
                             ),
                           ),
                         ),
@@ -347,145 +354,174 @@ class _StockWidgetState extends State<StockWidget> {
                   ],
                 ),
               ),
+              SizedBox(
+                height: 16,
+              ),
               Container(
                 width: double.infinity,
                 height: 200,
                 decoration: BoxDecoration(
                   color: Colors.transparent,
                 ),
-                child: FutureBuilder(
-                    future: history,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        return Text('Could not load chart');
-                      } else {
-                        return LineChart(
-                          LineChartData(
-                            lineTouchData: LineTouchData(
-                              getTouchedSpotIndicator:
-                                  (LineChartBarData barData,
-                                      List<int> spotIndexes) {
-                                return spotIndexes.map((spotIndex) {
-                                  //touch line style
-                                  return TouchedSpotIndicatorData(
-                                    FlLine(
-                                      color: _priceChangeColor.withOpacity(0.3),
-                                      strokeWidth: 1,
-                                    ),
-                                    FlDotData(
-                                      show: false,
-                                    ),
-                                  );
-                                }).toList();
-                              },
-                              touchTooltipData: LineTouchTooltipData(
-                                showOnTopOfTheChartBoxArea: true,
-                                fitInsideHorizontally: true,
-                                getTooltipItems:
-                                    // line chart on touch function here
-                                    (List<LineBarSpot> touchedBarSpots) {
-                                  return touchedBarSpots.map((barSpot) {
-                                    final flSpot = barSpot;
-                                    var date =
-                                        DateTime.fromMillisecondsSinceEpoch(
-                                            flSpot.x.toInt());
-                                    DateFormat formatter;
-                                    switch (_period) {
-                                      case '1d':
-                                        formatter =
-                                            DateFormat('yyyy-MM-dd HH:mm:ss');
-                                        break;
-                                      case '1w':
-                                        formatter =
-                                            DateFormat('yyyy-MM-dd HH:mm:ss');
-                                        break;
-                                      case '1mo':
-                                        formatter = DateFormat('yyyy-MM-dd');
-                                        break;
-                                      case '3mo':
-                                        formatter = DateFormat('yyyy-MM-dd');
-                                        break;
-                                      case '1y':
-                                        formatter = DateFormat('yyyy-MM-dd');
-                                        break;
-                                      case '5y':
-                                        formatter = DateFormat('yyyy-MM-dd');
-                                        break;
-                                      default:
-                                        formatter =
-                                            DateFormat('yyyy-MM-dd HH:mm:ss');
-                                    }
-
-                                    WidgetsBinding.instance
-                                        .addPostFrameCallback((_) =>
-                                            setState(() {
-                                              _priceController.add(
-                                                  flSpot.y.toStringAsFixed(2));
-                                            }));
-
-                                    return LineTooltipItem(
-                                      formatter.format(date),
-                                      TextStyle(
-                                        color: StockTheme.textColor
-                                            .withOpacity(0.6),
-                                        fontWeight: FontWeight.bold,
+                child: GestureDetector(
+                  //when the user taps the chart, _touch will be set to true, when released, it will be set to false
+                  //somehow onTapUp doesn't work, so I used Flchart's touchCallback
+                  onTapDown: (details) => _touch = true,
+                  child: FutureBuilder(
+                      future: history,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return Text('Could not load chart');
+                        } else {
+                          return LineChart(
+                            LineChartData(
+                              lineTouchData: LineTouchData(
+                                enabled: true,
+                                handleBuiltInTouches: true,
+                                touchCallback: (lineTouchEvent, touchResponse) {
+                                  //print(lineTouchEvent);
+                                  if (lineTouchEvent is FlTapUpEvent ||
+                                      lineTouchEvent is FlLongPressEnd ||
+                                      lineTouchEvent is FlPanEndEvent) {
+                                    // Handle tap up event here
+                                    _touch = false;
+                                    setState(() {
+                                      _getCurrPrice(widget.ticker);
+                                    });
+                                  }
+                                },
+                                getTouchedSpotIndicator:
+                                    (LineChartBarData barData,
+                                        List<int> spotIndexes) {
+                                  return spotIndexes.map((spotIndex) {
+                                    //touch line style
+                                    return TouchedSpotIndicatorData(
+                                      FlLine(
+                                        color:
+                                            _priceChangeColor.withOpacity(0.3),
+                                        strokeWidth: 1,
+                                      ),
+                                      FlDotData(
+                                        show: false,
                                       ),
                                     );
                                   }).toList();
                                 },
-                                tooltipBgColor: Colors.transparent,
-                              ),
-                            ),
-                            gridData: FlGridData(show: false),
-                            borderData: FlBorderData(show: false),
-                            titlesData: FlTitlesData(
-                              bottomTitles: AxisTitles(
-                                sideTitles: SideTitles(showTitles: false),
-                              ),
-                              leftTitles: AxisTitles(
-                                  sideTitles: SideTitles(showTitles: false)),
-                              topTitles: AxisTitles(
-                                  sideTitles: SideTitles(showTitles: false)),
-                              rightTitles: AxisTitles(
-                                  sideTitles: SideTitles(showTitles: false)),
-                            ),
-                            lineBarsData: [
-                              LineChartBarData(
-                                shadow: Shadow(
-                                  color: _priceChangeColor.withOpacity(0.3),
-                                  offset: Offset(0, 8),
-                                  blurRadius: 8,
+                                touchTooltipData: LineTouchTooltipData(
+                                  showOnTopOfTheChartBoxArea: true,
+                                  fitInsideHorizontally: true,
+                                  getTooltipItems:
+                                      // line chart on touch function here
+                                      (List<LineBarSpot> touchedBarSpots) {
+                                    return touchedBarSpots.map((barSpot) {
+                                      final flSpot = barSpot;
+                                      var date =
+                                          DateTime.fromMillisecondsSinceEpoch(
+                                              flSpot.x.toInt());
+                                      DateFormat formatter;
+                                      switch (_period) {
+                                        case '1d':
+                                          formatter =
+                                              DateFormat('yyyy-MM-dd HH:mm:ss');
+                                          break;
+                                        case '1w':
+                                          formatter =
+                                              DateFormat('yyyy-MM-dd HH:mm:ss');
+                                          break;
+                                        case '1mo':
+                                          formatter = DateFormat('yyyy-MM-dd');
+                                          break;
+                                        case '3mo':
+                                          formatter = DateFormat('yyyy-MM-dd');
+                                          break;
+                                        case '1y':
+                                          formatter = DateFormat('yyyy-MM-dd');
+                                          break;
+                                        case '5y':
+                                          formatter = DateFormat('yyyy-MM-dd');
+                                          break;
+                                        default:
+                                          formatter =
+                                              DateFormat('yyyy-MM-dd HH:mm:ss');
+                                      }
+                                      WidgetsBinding.instance
+                                          .addPostFrameCallback((_) {
+                                        setState(
+                                          () {
+                                            if (_touch) {
+                                              _priceChangeController.add(
+                                                  (flSpot.y - _firstPrice)
+                                                      .toStringAsFixed(2));
+                                              _priceController.add(
+                                                  flSpot.y.toStringAsFixed(2));
+                                            }
+                                          },
+                                        );
+                                      });
+                                      return LineTooltipItem(
+                                        formatter.format(date),
+                                        TextStyle(
+                                          color: StockTheme.textColor
+                                              .withOpacity(0.6),
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      );
+                                    }).toList();
+                                  },
+                                  tooltipBgColor: Colors.transparent,
                                 ),
-                                spots: _spots,
-                                gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      _priceChangeColor,
-                                      _priceChangeColor,
-                                    ]),
-                                barWidth: 2,
-                                isStrokeCapRound: true,
-                                dotData: FlDotData(
-                                  show: false,
+                              ),
+                              gridData: FlGridData(show: false),
+                              borderData: FlBorderData(show: false),
+                              titlesData: FlTitlesData(
+                                bottomTitles: AxisTitles(
+                                  sideTitles: SideTitles(showTitles: false),
                                 ),
-                                // line chart below gradient
-                                belowBarData: BarAreaData(
+                                leftTitles: AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false)),
+                                topTitles: AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false)),
+                                rightTitles: AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false)),
+                              ),
+                              lineBarsData: [
+                                LineChartBarData(
+                                  shadow: Shadow(
+                                    color: _priceChangeColor.withOpacity(0.3),
+                                    offset: Offset(0, 8),
+                                    blurRadius: 8,
+                                  ),
+                                  spots: _spots,
                                   gradient: LinearGradient(
                                       begin: Alignment.topCenter,
                                       end: Alignment.bottomCenter,
                                       colors: [
-                                        _priceChangeColor.withOpacity(0.2),
-                                        _priceChangeColor.withOpacity(0),
+                                        _priceChangeColor,
+                                        _priceChangeColor,
                                       ]),
-                                  show: true,
-                                ),
-                              )
-                            ],
-                          ),
-                        );
-                      }
-                    }),
+                                  barWidth: 2,
+                                  isStrokeCapRound: true,
+                                  dotData: FlDotData(
+                                    show: false,
+                                  ),
+                                  // line chart below gradient
+                                  belowBarData: BarAreaData(
+                                    gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          _priceChangeColor.withOpacity(0.2),
+                                          _priceChangeColor.withOpacity(0),
+                                        ]),
+                                    show: true,
+                                  ),
+                                )
+                              ],
+                            ),
+                          );
+                        }
+                      }),
+                ),
               ),
               SizedBox(
                 height: 16,
