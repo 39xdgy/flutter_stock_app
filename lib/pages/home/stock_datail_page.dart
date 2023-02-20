@@ -6,6 +6,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 import 'package:fortune_cookie/themes/stock_theme.dart' as StockTheme;
+import 'package:animated_flip_counter/animated_flip_counter.dart';
 
 class StockWidget extends StatefulWidget {
   var ticker;
@@ -27,7 +28,7 @@ class _StockWidgetState extends State<StockWidget> {
   late Future history;
   String _period = '1d';
   String _interval = '1m';
-  final StreamController<String> _priceController = StreamController<String>();
+  final StreamController<double> _priceController = StreamController<double>();
   final StreamController<String> _priceChangeController =
       StreamController<String>();
   final StreamController<String> _priceChangePercentController =
@@ -37,6 +38,8 @@ class _StockWidgetState extends State<StockWidget> {
   Color _priceChangeColor = Colors.white;
   IconData _priceChangeIcon = Icons.block;
   String _priceChangeText = "";
+  double _maxX = 0;
+  List<double> _xAxisLabel = [];
   bool _loading = true;
   bool _touch = false;
   bool _1d = true;
@@ -57,6 +60,9 @@ class _StockWidgetState extends State<StockWidget> {
         setState(() {
           _getCurrPrice(widget.ticker);
         });
+        if (_period == '1d') {
+          _getHistory(widget.ticker, _period, _interval);
+        }
       }
     });
 
@@ -71,7 +77,11 @@ class _StockWidgetState extends State<StockWidget> {
       var data = json.decode(response.body);
       //format the history data to FLchart format
       List<FlSpot> stockData = [];
+      // initialize variables for gap detection
+      int prevTimestamp = 0;
+      int prevShift = 0;
       for (var time in data['Close'].keys) {
+        _xAxisLabel.add(double.parse(time));
         stockData.add(
           FlSpot(double.parse(time), data['Close'][time]),
         );
@@ -80,7 +90,9 @@ class _StockWidgetState extends State<StockWidget> {
       //get the first time and price
       String firstTime = data['Close'].keys.first;
       double firstPrice = data['Close'][firstTime];
-
+      if (period == '1d') {
+        _maxX = double.parse(firstTime) + 23350000;
+      }
       //set the price change color
       setState(
         () {
@@ -141,7 +153,7 @@ class _StockWidgetState extends State<StockWidget> {
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       double currPrice = data['lastPrice'];
-      _priceController.add(data['lastPrice'].toStringAsFixed(2));
+      _priceController.add(data['lastPrice']);
       //calculate price change
       double priceChange = currPrice - _firstPrice;
       //calculate price change percentage
@@ -256,18 +268,23 @@ class _StockWidgetState extends State<StockWidget> {
                     ),
                     Align(
                       alignment: AlignmentDirectional(-0.9, 0),
-                      child: StreamBuilder<String>(
+                      child: StreamBuilder<double>(
                         stream: _priceController.stream,
                         builder: (BuildContext context,
-                            AsyncSnapshot<String> snapshot) {
+                            AsyncSnapshot<double> snapshot) {
                           if (snapshot.hasData) {
-                            return Text('\$${snapshot.data}',
-                                style: GoogleFonts.getFont(
-                                  'Inter',
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 32,
-                                  color: StockTheme.textColor,
-                                ));
+                            return AnimatedFlipCounter(
+                              prefix: "\$",
+                              fractionDigits: 2,
+                              value: snapshot.data ?? 0,
+                              duration: Duration(milliseconds: 250),
+                              textStyle: GoogleFonts.getFont(
+                                'Inter',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 32,
+                                color: StockTheme.textColor,
+                              ),
+                            );
                           } else {
                             return Container();
                           }
@@ -375,6 +392,7 @@ class _StockWidgetState extends State<StockWidget> {
                         } else {
                           return LineChart(
                             LineChartData(
+                              maxX: _period == '1d' ? _maxX : null,
                               lineTouchData: LineTouchData(
                                 enabled: true,
                                 handleBuiltInTouches: true,
@@ -398,7 +416,7 @@ class _StockWidgetState extends State<StockWidget> {
                                     return TouchedSpotIndicatorData(
                                       FlLine(
                                         color:
-                                            _priceChangeColor.withOpacity(0.3),
+                                            _priceChangeColor.withOpacity(0.5),
                                         strokeWidth: 1,
                                       ),
                                       FlDotData(
@@ -452,8 +470,7 @@ class _StockWidgetState extends State<StockWidget> {
                                               _priceChangeController.add(
                                                   (flSpot.y - _firstPrice)
                                                       .toStringAsFixed(2));
-                                              _priceController.add(
-                                                  flSpot.y.toStringAsFixed(2));
+                                              _priceController.add(flSpot.y);
                                             }
                                           },
                                         );
@@ -486,6 +503,7 @@ class _StockWidgetState extends State<StockWidget> {
                               ),
                               lineBarsData: [
                                 LineChartBarData(
+                                  //below bar neon effect
                                   shadow: Shadow(
                                     color: _priceChangeColor.withOpacity(0.3),
                                     offset: Offset(0, 8),
@@ -504,7 +522,7 @@ class _StockWidgetState extends State<StockWidget> {
                                   dotData: FlDotData(
                                     show: false,
                                   ),
-                                  // line chart below gradient
+                                  // line chart below gradient color
                                   belowBarData: BarAreaData(
                                     gradient: LinearGradient(
                                         begin: Alignment.topCenter,
@@ -581,7 +599,7 @@ class _StockWidgetState extends State<StockWidget> {
                           _1y = false;
                           _5y = false;
                           _period = '5d';
-                          _interval = '5m';
+                          _interval = '15m';
                           history =
                               _getHistory(widget.ticker, _period, _interval);
                         });
