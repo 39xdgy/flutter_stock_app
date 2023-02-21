@@ -39,7 +39,7 @@ class _StockWidgetState extends State<StockWidget> {
   IconData _priceChangeIcon = Icons.block;
   String _priceChangeText = "";
   double _maxX = 0;
-  List<double> _xAxisLabel = [];
+  Map<int, double> _xAxisLabel = {};
   bool _loading = true;
   bool _touch = false;
   bool _1d = true;
@@ -77,22 +77,19 @@ class _StockWidgetState extends State<StockWidget> {
       var data = json.decode(response.body);
       //format the history data to FLchart format
       List<FlSpot> stockData = [];
-      // initialize variables for gap detection
-      int prevTimestamp = 0;
-      int prevShift = 0;
-      for (var time in data['Close'].keys) {
-        _xAxisLabel.add(double.parse(time));
+      for (int i = 0; i < data['Close'].keys.length; i++) {
+        _xAxisLabel[i] = double.parse(data['Close'].keys.elementAt(i));
+
+        double price = data['Close'][data['Close'].keys.elementAt(i)];
         stockData.add(
-          FlSpot(double.parse(time), data['Close'][time]),
+          FlSpot(i.toDouble(), price),
         );
       }
 
       //get the first time and price
       String firstTime = data['Close'].keys.first;
       double firstPrice = data['Close'][firstTime];
-      if (period == '1d') {
-        _maxX = double.parse(firstTime) + 23350000;
-      }
+
       //set the price change color
       setState(
         () {
@@ -382,7 +379,7 @@ class _StockWidgetState extends State<StockWidget> {
                 ),
                 child: GestureDetector(
                   //when the user taps the chart, _touch will be set to true, when released, it will be set to false
-                  //somehow onTapUp doesn't work, so I used Flchart's touchCallback
+
                   onTapDown: (details) => _touch = true,
                   child: FutureBuilder(
                       future: history,
@@ -392,7 +389,7 @@ class _StockWidgetState extends State<StockWidget> {
                         } else {
                           return LineChart(
                             LineChartData(
-                              maxX: _period == '1d' ? _maxX : null,
+                              maxX: _period == '1d' ? 390 : null,
                               lineTouchData: LineTouchData(
                                 enabled: true,
                                 handleBuiltInTouches: true,
@@ -435,7 +432,8 @@ class _StockWidgetState extends State<StockWidget> {
                                       final flSpot = barSpot;
                                       var date =
                                           DateTime.fromMillisecondsSinceEpoch(
-                                              flSpot.x.toInt());
+                                        _xAxisLabel[flSpot.x.toInt()]!.toInt(),
+                                      );
                                       DateFormat formatter;
                                       switch (_period) {
                                         case '1d':
@@ -447,7 +445,8 @@ class _StockWidgetState extends State<StockWidget> {
                                               DateFormat('yyyy-MM-dd HH:mm:ss');
                                           break;
                                         case '1mo':
-                                          formatter = DateFormat('yyyy-MM-dd');
+                                          formatter =
+                                              DateFormat('yyyy-MM-dd HH:mm:ss');
                                           break;
                                         case '3mo':
                                           formatter = DateFormat('yyyy-MM-dd');
@@ -599,7 +598,7 @@ class _StockWidgetState extends State<StockWidget> {
                           _1y = false;
                           _5y = false;
                           _period = '5d';
-                          _interval = '15m';
+                          _interval = '5m';
                           history =
                               _getHistory(widget.ticker, _period, _interval);
                         });
