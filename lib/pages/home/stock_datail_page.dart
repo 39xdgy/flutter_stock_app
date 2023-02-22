@@ -130,13 +130,13 @@ class _StockWidgetState extends State<StockWidget> {
         _priceChangeController.add((-1 * priceChange).toStringAsFixed(2));
         _priceChangePercentController
             .add((-1 * priceChangePercent).toStringAsFixed(2));
-        _priceChangeColor = Color.fromARGB(255, 230, 72, 1);
+        _priceChangeColor = StockTheme.priceDecreaseColor;
         _priceChangeIcon = Icons.arrow_drop_down;
       } else {
         _priceChangeController.add(priceChange.toStringAsFixed(2));
         _priceChangePercentController
             .add(priceChangePercent.toStringAsFixed(2));
-        _priceChangeColor = Color.fromARGB(255, 0, 200, 6);
+        _priceChangeColor = StockTheme.priceIncreaseColor;
         _priceChangeIcon = Icons.arrow_drop_up;
       }
       return stockData;
@@ -162,13 +162,13 @@ class _StockWidgetState extends State<StockWidget> {
         _priceChangeController.add((-1 * priceChange).toStringAsFixed(2));
         _priceChangePercentController
             .add((-1 * priceChangePercent).toStringAsFixed(2));
-        _priceChangeColor = Color.fromARGB(255, 230, 72, 1);
+        _priceChangeColor = StockTheme.priceDecreaseColor;
         _priceChangeIcon = Icons.arrow_drop_down;
       } else {
         _priceChangeController.add(priceChange.toStringAsFixed(2));
         _priceChangePercentController
             .add(priceChangePercent.toStringAsFixed(2));
-        _priceChangeColor = Color.fromARGB(255, 0, 200, 6);
+        _priceChangeColor = StockTheme.priceIncreaseColor;
         _priceChangeIcon = Icons.arrow_drop_up;
       }
 
@@ -314,7 +314,7 @@ class _StockWidgetState extends State<StockWidget> {
                           ),
                         ),
                         Container(
-                          width: 120,
+                          width: 200,
                           height: 30,
                           decoration: BoxDecoration(
                             color: Color(0x00FFFFFF),
@@ -331,7 +331,7 @@ class _StockWidgetState extends State<StockWidget> {
                                   double percent =
                                       100 * priceChange / _firstPrice;
                                   return Text(
-                                      '\$${snapshot.data}(${percent.toStringAsFixed(2)}%)',
+                                      '\$${snapshot.data}(${percent.toStringAsFixed(2)}%)  $_priceChangeText',
                                       style: GoogleFonts.getFont(
                                         'Inter',
                                         fontWeight: FontWeight.w500,
@@ -342,24 +342,6 @@ class _StockWidgetState extends State<StockWidget> {
                                   return Container();
                                 }
                               },
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: 100,
-                          height: 30,
-                          decoration: BoxDecoration(
-                            color: Color(0x00FFFFFF),
-                          ),
-                          child: Align(
-                            alignment: AlignmentDirectional(-1, 0),
-                            child: Text(
-                              _priceChangeText,
-                              style: GoogleFonts.getFont(
-                                'Inter',
-                                fontSize: 12,
-                                color: StockTheme.textColor,
-                              ),
                             ),
                           ),
                         ),
